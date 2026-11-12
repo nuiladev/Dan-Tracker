@@ -7,7 +7,7 @@ Overlay that shows the accuracy and judgements **of each song** in an osu!mania 
 - Total: accuracy and every judgement of the whole dan so far.
 
 ## Usage
-1. Open **tosu** and **osu!** (windowed or borderless; exclusive fullscreen hides any overlay).
+1. Open [**tosu**](https://github.com/tosuapp/tosu) and **osu!** (windowed or borderless; exclusive fullscreen hides any overlay).
 2. Run `DanTracker.exe` with `dans.json` in the same folder.
 3. Drag the overlay where you want it and press **Ctrl+Shift+L** to lock it (clicks go through).
 
@@ -68,6 +68,7 @@ src/
   net/                 tosu client (polls /json/v2)
   obs/                 local web server, page and state JSON for the OBS Browser Source
   core/                dan logic (splitting songs, judgements, accuracy), JSON parser
+res/                   app icon and Windows resource file
 tests/test_dan.cpp     logic tests
 config/dans.json       default configuration
 ```
@@ -75,6 +76,9 @@ config/dans.json       default configuration
 ## Credits
 - Creator & Programmer – NuilaDev (Discord: zrwz0)
 - Tester – eQualize (Discord: frawog)
+
+## Acknowledgements
+Huge thanks to the creators and contributors of [**tosu**](https://github.com/tosuapp/tosu), the osu! memory reader that provides all the live data (map, timing and judgements) this overlay is built on. Dan Tracker would not exist without it.
 
 ## License
 MIT, see [LICENSE](LICENSE).

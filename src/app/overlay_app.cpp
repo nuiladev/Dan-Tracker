@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <string>
 
+#include "app/resource.h"
 #include "app/settings.h"
 #include "app/shared.h"
 #include "net/tosu_client.h"
@@ -34,6 +35,22 @@ static POINT g_shownPos{}, g_obsShownPos{};
 static UINT g_taskbarCreated;
 static ui::Buttons g_buttons;
 static TosuClient g_tosu;
+
+static HICON appIcon(int metric) {
+    int size = GetSystemMetrics(metric);
+    return (HICON)LoadImageW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(IDI_APP), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
+}
+
+static void registerClass(const wchar_t* name, WNDPROC proc, LPCWSTR cursor) {
+    WNDCLASSEXW wc{sizeof(wc)};
+    wc.lpfnWndProc = proc;
+    wc.hInstance = GetModuleHandleW(nullptr);
+    wc.hCursor = LoadCursor(nullptr, cursor);
+    wc.lpszClassName = name;
+    wc.hIcon = appIcon(SM_CXICON);
+    wc.hIconSm = appIcon(SM_CXSMICON);
+    RegisterClassExW(&wc);
+}
 
 static std::wstring obsUrl() { return L"http://127.0.0.1:" + std::to_wstring(g_shared.cfg.obsPort) + L"/"; }
 
@@ -134,7 +151,7 @@ static void trayIcon(DWORD action) {
     n.uID = 1;
     n.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     n.uCallbackMessage = WM_TRAY;
-    n.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+    n.hIcon = appIcon(SM_CXSMICON);
     wcscpy_s(n.szTip, L"Dan Tracker - click: show / hide, right-click: menu");
     Shell_NotifyIconW(action, &n);
 }
@@ -231,13 +248,7 @@ static void setObsWindow(bool on) {
     if (g_obs) return;
     static bool registered = false;
     if (!registered) {
-        WNDCLASSW wc{};
-        wc.lpfnWndProc = obsProc;
-        wc.hInstance = GetModuleHandleW(nullptr);
-        wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-        wc.lpszClassName = L"DanTrackerOBS";
-        wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-        RegisterClassW(&wc);
+        registerClass(L"DanTrackerOBS", obsProc, IDC_ARROW);
         registered = true;
     }
     g_obs = CreateWindowExW(0, L"DanTrackerOBS", L"Dan Tracker (OBS)",
@@ -286,15 +297,9 @@ static LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 }
 
 static void createOverlayWindow(HINSTANCE inst) {
-    WNDCLASSW wc{};
-    wc.lpfnWndProc = wndProc;
-    wc.hInstance = inst;
-    wc.hCursor = LoadCursor(nullptr, IDC_SIZEALL);
-    wc.lpszClassName = L"DanTracker";
-    wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-    RegisterClassW(&wc);
+    registerClass(L"DanTracker", wndProc, IDC_SIZEALL);
     HWND owner = CreateWindowExW(0, L"STATIC", L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, inst, nullptr);
-    g_hwnd = CreateWindowExW(WS_EX_LAYERED | WS_EX_TOPMOST, wc.lpszClassName, L"Dan Tracker", WS_POPUP, g_set.x, g_set.y,
+    g_hwnd = CreateWindowExW(WS_EX_LAYERED | WS_EX_TOPMOST, L"DanTracker", L"Dan Tracker", WS_POPUP, g_set.x, g_set.y,
                              (int)ui::kWidth, 200, owner, nullptr, inst, nullptr);
     applyLock();
     ShowWindow(g_hwnd, SW_SHOWNOACTIVATE);
