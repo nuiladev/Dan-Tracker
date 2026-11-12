@@ -62,11 +62,14 @@ Run `build.bat` (needs Visual Studio with the C++ tools). It compiles, runs the 
 
 ```
 src/
-  main.cpp           window, rendering, input
-  core/              dan logic (splitting songs, judgements, accuracy) and JSON parser
-  obs/               local web server and page for the OBS Browser Source
-tests/test_dan.cpp   logic tests
-config/dans.json     default configuration
+  main.cpp             entry point
+  app/                 windows, menu, hotkeys, tray icon, hiding, settings (overlay.ini), shared state
+  ui/                  everything visual: theme, Direct2D canvas, overlay view (dan, waiting, credits)
+  net/                 tosu client (polls /json/v2)
+  obs/                 local web server, page and state JSON for the OBS Browser Source
+  core/                dan logic (splitting songs, judgements, accuracy), JSON parser
+tests/test_dan.cpp     logic tests
+config/dans.json       default configuration
 ```
 
 ## Credits
