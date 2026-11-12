@@ -1,0 +1,17 @@
+{
+  "tosuHost": "127.0.0.1",
+  "tosuPort": 24050,
+
+  "songsPerDan": 4,
+  "minGapMs": 3000,
+
+  "autoKeywords": ["dan"],
+
+  "dans": [
+    {
+      "name": "Example - 1st Dan",
+      "versionContains": "1st Dan",
+      "songs": ["Song 1", "Song 2", "Song 3", "Song 4"]
+    }
+  ]
+}

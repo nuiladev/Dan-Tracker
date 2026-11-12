@@ -1,0 +1,7 @@
+build/
+*.obj
+*.exe
+*.pdb
+overlay.ini
+dans_marcados.txt
+tosu_debug.json
