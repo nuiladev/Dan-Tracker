@@ -9,6 +9,10 @@ struct Hits {
     Hits operator-(const Hits& o) const {
         return {max - o.max, h300 - o.h300, h200 - o.h200, h100 - o.h100, h50 - o.h50, miss - o.miss};
     }
+    bool operator==(const Hits& o) const {
+        return max == o.max && h300 == o.h300 && h200 == o.h200 && h100 == o.h100 && h50 == o.h50 && miss == o.miss;
+    }
+    bool operator!=(const Hits& o) const { return !(*this == o); }
     static Hits fromTosu(const Json& j);
 };
 
@@ -67,6 +71,9 @@ struct SongView {
     Hits hits;
     SongStatus status = SongStatus::Upcoming;
     double startMs = 0, endMs = 0;
+    bool operator==(const SongView& o) const {
+        return name == o.name && hits == o.hits && status == o.status && startMs == o.startMs && endMs == o.endMs;
+    }
 };
 
 class DanTracker {
@@ -74,6 +81,7 @@ public:
     explicit DanTracker(const Config* cfg) : cfg_(cfg) {}
     void setConfig(const Config* cfg) { cfg_ = cfg; mapKey_.clear(); }
     void update(const TosuSample& s);
+    bool sameOutput(const DanTracker& o) const;
 
     bool connected = false;
     bool isDan = false;

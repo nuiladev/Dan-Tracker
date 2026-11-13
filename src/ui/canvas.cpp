@@ -79,12 +79,12 @@ HDC beginFrame(int width, int height, float scale, D2D1_COLOR_F clear) {
     return g_memDC;
 }
 
-void endFrame() {
-    if (g_rt->EndDraw() == D2DERR_RECREATE_TARGET) {
-        g_brush->Release();
-        g_rt->Release();
-        createTarget();
-    }
+bool endFrame() {
+    if (g_rt->EndDraw() != D2DERR_RECREATE_TARGET) return true;
+    g_brush->Release();
+    g_rt->Release();
+    createTarget();
+    return false;
 }
 
 D2D1_COLOR_F rgb(unsigned hex, float a) {

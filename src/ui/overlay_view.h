@@ -23,6 +23,10 @@ struct ViewState {
     int tosuPort = 0;
     std::wstring warning;
     std::string configError;
+    bool operator==(const ViewState& o) const {
+        return locked == o.locked && showCredits == o.showCredits && tosuPort == o.tosuPort && warning == o.warning &&
+               configError == o.configError;
+    }
 };
 
 float overlayHeight(const DanTracker& t, const ViewState& v);

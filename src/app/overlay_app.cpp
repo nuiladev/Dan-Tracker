@@ -35,6 +35,9 @@ static POINT g_shownPos{}, g_obsShownPos{};
 static UINT g_taskbarCreated;
 static ui::Buttons g_buttons;
 static TosuClient g_tosu;
+static DanTracker g_drawn{nullptr};
+static ui::ViewState g_drawnView;
+static float g_drawnScale = 0;
 
 static HICON appIcon(int metric) {
     int size = GetSystemMetrics(metric);
@@ -66,15 +69,20 @@ static ui::ViewState viewState() {
     return v;
 }
 
-static void render() {
+static void render(bool force = false) {
     DanTracker t = snapshotTracker();
     ui::ViewState v = viewState();
+    if (!force && g_drawnScale == g_set.scale && v == g_drawnView && t.sameOutput(g_drawn)) return;
+    g_drawn = t;
+    g_drawnView = v;
+    g_drawnScale = g_set.scale;
+
     float H = ui::overlayHeight(t, v);
     int pw = (int)std::ceil(ui::kWidth * g_set.scale) + kHidePad, ph = (int)std::ceil(H * g_set.scale);
 
     HDC dc = ui::beginFrame(pw, ph, g_set.scale, D2D1::ColorF(0, 0, 0, 0));
     ui::drawOverlay(t, v, H, false, &g_buttons);
-    ui::endFrame();
+    if (!ui::endFrame()) g_drawnScale = 0;
     RECT wr;
     GetWindowRect(g_hwnd, &wr);
     POINT dst = {wr.left, wr.top}, src = {0, 0};
@@ -87,7 +95,7 @@ static void render() {
     obsView.locked = true;
     dc = ui::beginFrame(pw, ph, g_set.scale, D2D1::ColorF(0, 1, 0, 1));
     ui::drawOverlay(t, obsView, H, true, nullptr);
-    ui::endFrame();
+    if (!ui::endFrame()) g_drawnScale = 0;
     RECT cr;
     GetClientRect(g_obs, &cr);
     if (cr.right != pw || cr.bottom != ph) {
@@ -229,7 +237,7 @@ static void runAction(ui::Action a) {
 
 static LRESULT CALLBACK obsProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
-        case WM_PAINT: { PAINTSTRUCT ps; BeginPaint(hwnd, &ps); EndPaint(hwnd, &ps); render(); return 0; }
+        case WM_PAINT: { PAINTSTRUCT ps; BeginPaint(hwnd, &ps); EndPaint(hwnd, &ps); render(true); return 0; }
         case WM_ERASEBKGND: return 1;
         case WM_CLOSE: g_set.chroma = false; DestroyWindow(hwnd); g_obs = nullptr; saveSettings(); return 0;
         case WM_SYSCOMMAND:
@@ -345,7 +353,7 @@ int runOverlayApp(HINSTANCE inst) {
         g_warning += (g_warning.empty() ? L"" : L" | ") + (L"OBS port " + std::to_wstring(g_shared.cfg.obsPort) + L" in use");
     g_tosu.start(g_shared.cfg.host, g_shared.cfg.port, onTosuSample);
     SetTimer(g_hwnd, 1, 33, nullptr);
-    render();
+    render(true);
 
     MSG m;
     while (GetMessageW(&m, nullptr, 0, 0) > 0) {

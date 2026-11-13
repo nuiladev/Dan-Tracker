@@ -17,7 +17,7 @@ extern Fonts F;
 bool initCanvas();
 
 HDC beginFrame(int width, int height, float scale, D2D1_COLOR_F clear);
-void endFrame();
+bool endFrame();
 
 D2D1_COLOR_F rgb(unsigned hex, float a = 1.0f);
 void fillRound(D2D1_RECT_F r, float rad, D2D1_COLOR_F c);

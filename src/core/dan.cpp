@@ -301,6 +301,13 @@ void DanTracker::setLiveHits(const Hits& cum) {
     songs[current].status = SongStatus::Live;
 }
 
+bool DanTracker::sameOutput(const DanTracker& o) const {
+    return connected == o.connected && isDan == o.isDan && finished == o.finished && scoreV2 == o.scoreV2 &&
+           state == o.state && current == o.current && liveMs == o.liveMs && danName == o.danName &&
+           mapLabel == o.mapLabel && note == o.note && checksum == o.checksum && songs == o.songs &&
+           cumulative == o.cumulative;
+}
+
 void DanTracker::update(const TosuSample& s) {
     connected = s.connected;
     if (!s.connected) return;
